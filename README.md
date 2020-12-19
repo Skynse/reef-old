@@ -10,5 +10,11 @@ ___
 [ ] Selective Port scanning (tcp or udp?)\
 [ ] Windows Support (only unix supported currently)
 
+## Installation
+
+> sudo python3 setup.py install
+
+### Using the port scanner
+> reef -sP \<ip addr>
 ![Preview](preview/preview.gif)
 
