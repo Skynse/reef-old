@@ -4,10 +4,9 @@ import platform
 import typing as t
 import threading
 import re
-import struct
 import scapy.all as scapy
 from queue import Queue
-from table import make_table
+from reef.table import make_table
 
 HOST_IP = socket.gethostbyname(socket.gethostname())
 
