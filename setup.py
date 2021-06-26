@@ -15,5 +15,6 @@ setup(
     description = "Network Analysis tool.",
     long_description = long_descr,
     author = "Skynse",
+    include_package_data=True,
     author_email = "prodbyskynse@gmail.com",
     )
