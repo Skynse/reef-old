@@ -1,4 +1,3 @@
-import os
 import sys
 import socket
 import platform
@@ -6,8 +5,9 @@ import typing as t
 import threading
 import re
 import struct
-import subprocess
+import scapy.all as scapy
 from queue import Queue
+from table import make_table
 
 HOST_IP = socket.gethostbyname(socket.gethostname())
 
@@ -15,6 +15,7 @@ types = {
     "pscan": lambda i: f"Scanning ports in IP: {i}",
     "presult": lambda r: "\n".join([f"[OPEN]: {i}" for i in r]),
 }
+
 
 def debug(_type: str, obj: t.Union[int, str]) -> str:
     """easy debugging function"""
@@ -29,21 +30,14 @@ def validate(target: str) -> None:
         sys.exit("Aborted: Invalid IPV4 address")
 
 
-def getplatform() -> str:
+def get_platform() -> str:
     """For platform specific functions"""
     return platform.system()
 
 
-def get_default_gateway_linux() -> str:
+def get_gateway() -> str:
     """Read the default gateway directly from /proc."""
-    with open("/proc/net/route") as fh:
-        for line in fh:
-            fields = line.strip().split()
-            if fields[1] != "00000000" or not int(fields[3], 16) & 2:
-                # If not default route or not RTF_GATEWAY, skip it
-                continue
-                    
-            return socket.inet_ntoa(struct.pack("<L", int(fields[2], 16)))
+    return scapy.get_if_addr(scapy.conf.iface)
 
 
 class IPScanner:
@@ -55,39 +49,37 @@ class IPScanner:
     def __init__(self):
         self.q = Queue()
 
-    def scan(self, end: int) -> None:
-        if platform.system() == "Windows":
-            com = "ping -n 1 "
-        else:
-            com = "ping -c 1 "
-        try:
-            addr = ".".join(get_default_gateway_linux().split(".")[:3]) + "." + str(end)
-            process = com + addr
-            resp = subprocess.call(process.split(), stderr=subprocess.DEVNULL, stdout=open(os.devnull, "w"))
-            if not resp:
-                print(f"FOUND {addr}@{socket.gethostbyaddr(addr)[0]}")
+    def scan(self) -> None:
+        ip_list = []
+        ip = get_gateway() + "/24"
+        arp_req_frame = scapy.ARP(pdst=ip)
+        broadcast_ether_frame = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
+        broadcast_ether_arp_req_frame = broadcast_ether_frame / arp_req_frame
 
-        except KeyboardInterrupt:
-            sys.exit("Aborted")
-        except:
-            pass
+        answered_list = scapy.srp(
+            broadcast_ether_arp_req_frame, timeout=1, verbose=False
+        )[0]
+        result = []
+        for i in range(0, len(answered_list)):
+            client_dict = {
+                "ip": answered_list[i][1].psrc,
+                "mac": answered_list[i][1].hwsrc,
+            }
+            result.append(client_dict)
 
-    def threader(self) -> None:
-        while True:
-            worker = self.q.get()
-            self.scan(worker)
-            self.q.task_done()
-
-    def run(self) -> None:
-        for _ in range(100):
-            t = threading.Thread(target=self.threader)
-            t.daemon = True
-            t.start()
-
-        for worker in range(0, 256):
-            self.q.put(worker)
-
-        self.q.join()
+        for i in result:
+            try:
+                hostname = socket.gethostbyaddr(i.get("ip"))[0]
+            except:
+                hostname = "None"
+            ip_list.append([i.get("ip") + " ", hostname, i.get("mac")])
+        print(
+            make_table(
+                rows=ip_list,
+                labels=["ip", "hostname", "mac"],
+                centered=True,
+            )
+        )
 
 
 class PortScanner:
@@ -100,7 +92,7 @@ class PortScanner:
         r = sock.connect_ex((self.target, port))
 
         if r == 0:
-            print("[OPEN]:",port)
+            print("[OPEN]:", port)
             sock.close()
 
     def threader(self) -> None:

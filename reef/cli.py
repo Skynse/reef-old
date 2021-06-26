@@ -1,6 +1,7 @@
 import argparse
 from reef import scanner
 
+
 def main():
     parser = argparse.ArgumentParser()
 
