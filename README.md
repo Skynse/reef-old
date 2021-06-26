@@ -8,7 +8,7 @@ ___
 [x] Port Scanner\
 [x] IP Scanner\
 [ ] Selective Port scanning (tcp or udp?)\
-[x] Windows Support (only unix supported currently) (uses scapy)
+[x] Windows Support (uses scapy)
 
 ## Installation
 
@@ -18,4 +18,4 @@ ___
 
 > sudo python -E reef [-sI] [-Sp]
 
-
+![Preview](preview/preview.gif)
