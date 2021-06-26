@@ -1,7 +1,10 @@
 # Reef 
 Network information gathering tool
 
+# Feaures
 
+* Port Scanning
+* IP Scanning (with tables)
 ## Milestone
 ___
 
