@@ -1,4 +1,3 @@
-import argparse
 from reef.cli import main
 
 if __name__ == "__main__":
