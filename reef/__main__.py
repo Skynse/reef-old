@@ -15,4 +15,4 @@ if __name__ == "__main__":
 
     if args.sI:
         print("IP Scan enabled")
-        scanner.IPScanner().run()
+        scanner.IPScanner().scan()
