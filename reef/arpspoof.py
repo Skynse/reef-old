@@ -10,10 +10,6 @@ class ArpSpoofer:
     """
 
     def __init__(self, target, spoof_ip, g_mac):
-        """
-        :param str t_mac: target mac address
-
-        """
         self.target = target
         self.spoof_ip = spoof_ip
         self.gateway = get_gateway()
