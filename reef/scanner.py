@@ -7,6 +7,7 @@ import re
 import scapy.all as scapy
 from queue import Queue
 from reef.table import make_table
+from reef.utils import get_mac, get_gateway
 
 HOST_IP = socket.gethostbyname(socket.gethostname())
 
@@ -32,11 +33,6 @@ def validate(target: str) -> None:
 def get_platform() -> str:
     """For platform specific functions"""
     return platform.system()
-
-
-def get_gateway() -> str:
-    """Read the default gateway directly from /proc."""
-    return scapy.get_if_addr(scapy.conf.iface)
 
 
 class IPScanner:
