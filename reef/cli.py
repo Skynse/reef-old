@@ -13,6 +13,7 @@ def main():
 
     sniffargs = parser.add_argument_group('HTTP Sniffer')
     sniffargs.add_argument('--sniff', action='store_true')
+    sniffargs.add_argument('--iface', required=False, default=None)
 
     arpargs = parser.add_argument_group("Arpspoofer")
     arpargs.add_argument("-i", "--spoof", help="Spoofing IP")
@@ -33,4 +34,4 @@ def main():
         arpspoof.ArpSpoofer(args.target, args.spoof, args.gateway).execute()
 
     if args.sniff:
-        p_sniff.Sniffer().sniff_packets()
+        p_sniff.Sniffer(args.iface).sniff_packets()
