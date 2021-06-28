@@ -4,11 +4,15 @@ from scapy.layers.inet import IP
 from scapy.packet import Raw
 
 class Sniffer:
-    def __init__(self):
-        pass
+    def __init__(self, iface):
+        self.iface = iface
 
     def sniff_packets(self):
-        scapy.sniff(filter='tcp port 80', prn=self.process, store=True)
+        if self.iface:
+            scapy.sniff( prn=self.process, store=True, iface=self.iface)
+        else:
+            print('No interface selected so using default')
+            scapy.sniff(prn=self.process, store=True)
 
     def process(self, pkt: scapy.Packet):
         if pkt.haslayer(HTTPRequest):
