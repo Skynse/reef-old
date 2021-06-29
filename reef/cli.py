@@ -1,6 +1,6 @@
 import argparse
 from reef import scanner, arpspoof, p_sniff
-from scapy.sendrecv import sniff
+from rich import print
 
 
 def main():
@@ -11,15 +11,15 @@ def main():
     ipargs = parser.add_argument_group("Ip Scan")
     ipargs.add_argument("-sI", help="Scan IP addresses in subnet", action="store_true")
 
-    sniffargs = parser.add_argument_group('HTTP Sniffer')
-    sniffargs.add_argument('--sniff', action='store_true')
-    sniffargs.add_argument('--iface', required=False, default=None)
+    sniffargs = parser.add_argument_group("HTTP Sniffer")
+    sniffargs.add_argument("--sniff", action="store_true")
+    sniffargs.add_argument("--iface", required=False, default=None)
 
     arpargs = parser.add_argument_group("Arpspoofer")
     arpargs.add_argument("-i", "--spoof", help="Spoofing IP")
     arpargs.add_argument("-t", "--target", help="Target IP")
     arpargs.add_argument("-g", "--gateway", help="Router")
-    
+
     args = parser.parse_args()
 
     if args.sP:
@@ -27,7 +27,7 @@ def main():
         scanner.PortScanner(args.sP).run()
 
     if args.sI:
-        print("IP Scan enabled")
+        print("[red]IP Scan enabled[/red]")
         scanner.IPScanner().scan()
 
     if args.spoof:
