@@ -18,7 +18,7 @@ def main():
     arpargs = parser.add_argument_group("Arpspoofer")
     arpargs.add_argument("-i", "--spoof", help="Spoofing IP")
     arpargs.add_argument("-t", "--target", help="Target IP")
-    arpargs.add_argument("-g", "--gateway", help="Router")
+    arpargs.add_argument("-g", "--gateway", help="Gateway mac address")
 
     args = parser.parse_args()
 
