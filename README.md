@@ -19,6 +19,7 @@ ___
 
 ### Usage
 
-> sudo python -E reef [-sI] [-Sp]
+> sudo reef --help
 
-![Preview](preview/preview.gif)
+![Preview 1](imgs/img1.png)
+![Preview 1](imgs/img2.png)
