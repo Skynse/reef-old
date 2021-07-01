@@ -1,4 +1,6 @@
 # Reef 
+![icon](imgs/icon.png)
+
 Network information gathering tool
 
 # Feaures
