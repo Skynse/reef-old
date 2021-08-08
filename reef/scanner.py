@@ -6,7 +6,6 @@ import threading
 import re
 import scapy.all as scapy
 from queue import Queue
-from reef.table import make_table
 from reef.utils import get_mac, get_gateway
 from rich.table import Table
 from rich.console import Console
